@@ -1,4 +1,4 @@
-﻿
+
 
 $text=@"
 $ver
@@ -26,9 +26,10 @@ Function ShowMenu{
          Write-Host "==================== Please make a selection ====================="
          Write-Host ""
          Write-Host "Press '1' Get Service Tags of ALL Nodes"
-         Write-Host "Press '2' Get status of StorageJob"
-         Write-Host "Press '3' Get status of Physical Disk"
-         Write-Host "Press '4' Get status of Physical Disk"
+         Write-Host "Press '2' Get Status of StorageJob"
+         Write-Host "Press '3' Get Status of Physical Disk"
+         Write-Host "Press '4' Get OS Build Information of Nodes"
+         Write-Host "Press '5' Get Status of Virtual Disk"
          
          
          Write-Host "Press 'H' to Display Help"
@@ -86,6 +87,18 @@ Function ShowMenu{
                 Echo ""
                 Write-Host "----------------------------------------"
                 Write-Host "Displaying OS Build Information"
+                Write-Host "----------------------------------------"
+                Echo""
+                $nodes = Get-ClusterNode | % NodeName
+                Invoke-Command $nodes { $v = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\' -Name CurrentMajorVersionNumber, CurrentMinorVersionNumber, CurrentBuildNumber, UBR; "$(hostname): $($v.CurrentMajorVersionNumber).$($v.CurrentMinorVersionNumber).$($v.CurrentBuildNumber).$($v.UBR)" } | Sort-Object
+                Pause
+                break
+             }
+             5{
+                Echo ""
+                Echo ""
+                Write-Host "----------------------------------------"
+                Write-Host "Displaying Virtual Disks"
                 Write-Host "----------------------------------------"
                 Echo""
                 $nodes = Get-ClusterNode | % NodeName
