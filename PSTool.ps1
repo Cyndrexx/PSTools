@@ -274,6 +274,7 @@ Function ShowPatchingMenu{
          Write-Host ""
          Write-Host "Press '1' Get Solution Environment"
          Write-Host "Press '2' Get Available Update Information"
+         Write-Host "Press '3' Get Update Release Information"
          Write-Host "Press 'E' To Return to Main menu"
          $PatchSelection = Read-Host "Please make a selection"
 
@@ -294,6 +295,17 @@ Function ShowPatchingMenu{
                 Echo ""
                 Pause
                 break
+            }
+            3{
+                Write-Host ""
+                $sol = Read-Host "Which Solution ID"
+                Write-Host ""
+                $Update = Get-SolutionUpdate -Id $sol | FL ResourceId, State, DisplayName, ReleaseLink, RebootRequired, HealthState, HealthCheckResult
+                $Update
+                Echo ""
+                Pause
+                break
+            
             }
          
          }
