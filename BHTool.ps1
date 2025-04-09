@@ -121,9 +121,12 @@ Function ShowMenu{
                             #Get VMs on the node
                             $vms = Get-VM -ComputerName $node.Name
                             if($vms -match $findvm){
-                                Write-Host "Found VM in $node"
-                                pause
-                                break
+                                Echo ""
+                                Echo ""
+                                Write-Host "VM HAS BEEN FOUND"
+                                Write-Host "---------------------------------------------"
+                                Write-Host "VM found on node: $($node.Name)"
+                                Write-Host "---------------------------------------------"
                             }
                         }
                     }
