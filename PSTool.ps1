@@ -1,4 +1,4 @@
-﻿
+
 
 $text=@"
 $ver
@@ -21,12 +21,18 @@ Function ShowMenu{
          Write-Host ""
          Write-Host "==================== Please make a selection ====================="
          Write-Host ""
-         Write-Host "Press '1' Get Service Tags of ALL Nodes"
-         Write-Host "Press '2' Get Status of StorageJob"
-         Write-Host "Press '3' Get Status of Physical Disk"
-         Write-Host "Press '4' Get OS Build Information of Nodes"
-         Write-Host "Press '5' Get Status of Virtual Disk"
-         Write-Host "Press '6' Find a VM"
+         Write-Host "Press '1' To Access HCI Commands"
+         #Write-Host "Press '1' Get Service Tags of ALL Nodes"
+         #Write-Host "Press '2' Get Status of StorageJob"
+         Write-Host "Press '2' Get Status of Physical Disk"
+         Write-Host "Press '3' Get Disk Usage"
+         #Write-Host "Press 'p' For Patching Menu"
+
+         #Write-Host "Press '4' Get OS Build Information of Nodes"
+         #Write-Host "Press '5' Get Status of Virtual Disk"
+         #Write-Host "Press '6' Find a VM"
+         
+
          
          
          Write-Host "Press 'H' to Display Help"
@@ -36,45 +42,20 @@ Function ShowMenu{
 
 
          switch ($selection){
-
-
-                #Get Service Tags of all the Nodes within a cluster
+                #Display HCI Commands
              1{
-                Write-Host "Grabbing Service Tags..."
-                Echo ""
-                Echo ""
-                Write-Host "Server         Model                     Tag" 
-                Write-Host "-----------------------------------------------"
-                foreach($c in $(Get-ClusterNode)) 
-                    { Invoke-Command -ComputerName $c.Name -ScriptBlock 
-                        {Write-Host $env:COMPUTERNAME  " " (Get-WmiObject win32_computersystemproduct).Name "---- "  -NoNewLine 
-                         Write-Host "Service Tag = " -ForegroundColor Yellow -NoNewLine
-                        (Get-WmiObject win32_computersystemproduct).IdentifyingNumber | Out-Host }
-                    } 
-                Echo ""
-                Echo ""
-                Pause
-                break
-             }
-
-
-
-
-
-             #Get status of StorageJob
-             2{
-                Echo "";Echo ""
-                Write-Host "----------------------------------------"
-                Write-Host "Grabbing StorageJob Info"
-                Write-Host "----------------------------------------"
-                Echo ""
-                Get-StorageJob | Out-Host
-                Pause
-                break
+                    ShowHCIMenu
              
-             }
+                }#End of 1
+             pm{
+                    ShowPatchingMenu
+              
+              }
+
+
+
              #Grabbing Physical Disk Information
-             3{
+             2{
                 Echo "";Echo ""
                 Write-Host "----------------------------------------"
                 Write-Host "Grabbing Physical Disk Info"
@@ -84,20 +65,53 @@ Function ShowMenu{
                 Pause
                 break
              }
+             3{
+                Get-WmiObject -Class Win32_LogicalDisk | ForEach-Object {
+                        $driveType = switch ($_.DriveType) {
+                            2 { "Removable" }
+                            3 { "Local Disk" }
+                            4 { "Network" }
+                            5 { "CD-ROM" }
+                            6 { "RAM Disk" }
+                            default { "Unknown" }
+                        }
+
+                        $totalSize = $_.Size / 1MB
+                        $freeSpace = $_.FreeSpace / 1MB
+                        $usedSpace = $totalSize - $freeSpace
+                        $usedPercentage = if ($totalSize -eq 0) { 0 } else { [math]::Round($usedSpace / $totalSize * 100, 2) }
+                        $freePercentage = if ($totalSize -eq 0) { 0 } else { [math]::Round($freeSpace / $totalSize * 100, 2) }
+
+                        $sizeUnit = "MB"
+                        $totalSizeGB = $totalSize
+                        $usedSpaceGB = $usedSpace
+                        $freeSpaceGB = $freeSpace
+
+                        if ($totalSize -gt 1024) {
+                            $sizeUnit = "GB"
+                            $totalSizeGB = [math]::Round($totalSize / 1024, 2)
+                            $usedSpaceGB = [math]::Round($usedSpace / 1024, 2)
+                            $freeSpaceGB = [math]::Round($freeSpace / 1024, 2)
+                        }
+
+                        [PSCustomObject]@{
+                            Drive       = $_.DeviceID
+                            Type        = $driveType
+                            TotalSize   = "$totalSizeGB $sizeUnit"
+                            UsedSpace   = "$usedSpaceGB $sizeUnit"
+                            UsedPercent = "$usedPercentage %"
+                            FreeSpace   = "$freeSpaceGB $sizeUnit"
+                            FreePercent = "$freePercentage %"
+                        }
+                    } | Format-Table -AutoSize | Out-Host
+                     
+                     
+                     Pause
+                     ShowMenu
+             }#End of 3
 
              #Display OS Build of each Node
-             4{
-                Echo ""
-                Echo ""
-                Write-Host "----------------------------------------"
-                Write-Host "Displaying OS Build Information"
-                Write-Host "----------------------------------------"
-                Echo""
-                $nodes = Get-ClusterNode | % NodeName
-                Invoke-Command $nodes { $v = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\' -Name CurrentMajorVersionNumber, CurrentMinorVersionNumber, CurrentBuildNumber, UBR; "$(hostname): $($v.CurrentMajorVersionNumber).$($v.CurrentMinorVersionNumber).$($v.CurrentBuildNumber).$($v.UBR)" } | Sort-Object
-                Pause
-                break
-             }
+             
              5{
                 Echo ""
                 Echo ""
@@ -109,6 +123,7 @@ Function ShowMenu{
                 Pause
                 break
              }
+
              #Find a VM
              6{
              Echo ""
@@ -143,17 +158,134 @@ Function ShowMenu{
                     }
             
                 }
-            }
-        }
+                
+            }#End of Switch
+        }#End of "DO"
+
+
     while ($selection -ne "q")
     
     
     }
-    
+
+Function ShowHCIMenu{
+    do{
+        $HCIselection=""
+         Clear-Host
+         Write-Host $text
+         Write-Host ""
+         #Write-Host "Please make a selection of what you would like to do"
+         Write-Host ""
+         Write-Host "==================== Please make a selection ====================="
+         Write-Host ""
+         Write-Host "Press '1' Get Service Tags of ALL Nodes"
+         Write-Host "Press '2' Get-StorageJob"
+         Write-Host "Press '3' Get Status of Physical Disk"
+         Write-Host "Press '4' Get OS Build Information of Nodes"
+         Write-Host "Press 'E' To Return to Main menu"
+         $HCIselection = Read-Host "Please make a selection"
+      
     
     
 
-   
+    switch($HCISelection){
+             
+             
+             #Get Service Tags of all the Nodes within a cluster
+             1{
+                Write-Host "Grabbing Service Tags..."
+                Echo ""
+                Echo ""
+                Write-Host "Server         Model                     Tag" 
+                Write-Host "-----------------------------------------------"
+                foreach($c in $(Get-ClusterNode)) 
+                    { Invoke-Command -ComputerName $c.Name -ScriptBlock 
+                        {Write-Host $env:COMPUTERNAME  " " (Get-WmiObject win32_computersystemproduct).Name "---- "  -NoNewLine 
+                         Write-Host "Service Tag = " -ForegroundColor Yellow -NoNewLine
+                        (Get-WmiObject win32_computersystemproduct).IdentifyingNumber | Out-Host }
+                    } 
+                Echo ""
+                Echo ""
+                Pause
+                break
+             }
+             #Get status of StorageJob
+             2{
+                Echo "";Echo ""
+                Write-Host "----------------------------------------"
+                Write-Host "Grabbing StorageJob Info"
+                Write-Host "----------------------------------------"
+                Echo ""
+                Get-StorageJob | Out-Host
+                Pause
+                break
+             
+             }#End of 2
 
+             3{
+                Echo "";Echo ""
+                Write-Host "----------------------------------------"
+                Write-Host "Grabbing Physical Disk Info"
+                Write-Host "----------------------------------------"
+                Echo ""
+                Get-PhysicalDisk | Out-Host
+                Pause
+                break
+             }#END of 3
+
+             4{
+                Echo ""
+                Echo ""
+                Write-Host "----------------------------------------"
+                Write-Host "Displaying OS Build Information"
+                Write-Host "----------------------------------------"
+                Echo""
+                $nodes = Get-ClusterNode | % NodeName
+                Invoke-Command $nodes { $v = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\' -Name CurrentMajorVersionNumber, CurrentMinorVersionNumber, CurrentBuildNumber, UBR; "$(hostname): $($v.CurrentMajorVersionNumber).$($v.CurrentMinorVersionNumber).$($v.CurrentBuildNumber).$($v.UBR)" } | Sort-Object
+                Pause
+                break
+             }
+        e{
+            Write-Host ""
+            Write-Host "Returning to Main Menu...."
+            Write-Host ""
+            Write-Host ""
+            Start-Sleep -seconds 3
+            ShowMenu
+            }
+        
+
+
+     }#end of Switch
+    }while($HCIselection -ne "e") #END of "DO"
+
+}
+
+
+Function ShowPatchingMenu{
+        do{
+        $PatchSelection=""
+         Clear-Host
+         Write-Host $text
+         Write-Host ""
+         #Write-Host "Please make a selection of what you would like to do"
+         Write-Host ""
+         Write-Host "==================== Please make a selection ====================="
+         Write-Host ""
+         Write-Host "Press '1' Get Solution Environment"
+         Write-Host "Press 'E' To Return to Main menu"
+         $PatchSelection = Read-Host "Please make a selection"
+
+         switch($PatchSelection){
+            1{
+                Get-SolutionUpdateEnvironment | Out-Host
+                Pause
+                break
+            }
+         
+         }
+
+         }While($PatchSelection -ne "e")
+}
 
 ShowMenu
