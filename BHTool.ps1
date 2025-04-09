@@ -119,8 +119,8 @@ Function ShowMenu{
                         foreach ($node in $nodes) {
                             Write-Host "  Checking Node: $($node.Name)"
                             #Get VMs on the node
-                            $vms = Get-VM
-                            if($vms -contains $findvm){
+                            $vms = Get-VM -ComputerName $node.Name
+                            if($vms -match $findvm){
                                 Write-Host "Found VM in $node"
                                 pause
                                 break
