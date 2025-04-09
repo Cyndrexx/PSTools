@@ -279,12 +279,19 @@ Function ShowPatchingMenu{
 
          switch($PatchSelection){
             1{
-                Get-SolutionUpdateEnvironment | Out-Host
+                Write-Host ""
+                Write-Host "The Current Solution Environment Status as follows:"
+                Write-Host ""
+                Get-SolutionUpdateEnvironment | FL CurrentVersion, CurrentSbeVersion, State, HealthState, HealthCheckDate  -Autosize
                 Pause
                 break
             }
             2{
+                Write-Host ""
+                Write-Host "Below are the following Available Updates.  Solutions generally go before any SBE update"
+                Write-Host ""
                 Get-SolutionUpdate | Where-Object {$_.State -like "Ready*" -or $_.State -like "Additional*"} | FT DisplayName, Description, ResourceId, State, PackageType -Autosize
+                Echo ""
                 Pause
                 break
             }
