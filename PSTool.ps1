@@ -273,6 +273,7 @@ Function ShowPatchingMenu{
          Write-Host "==================== Please make a selection ====================="
          Write-Host ""
          Write-Host "Press '1' Get Solution Environment"
+         Write-Host "Press '2' Get Available Update Information"
          Write-Host "Press 'E' To Return to Main menu"
          $PatchSelection = Read-Host "Please make a selection"
 
@@ -283,7 +284,7 @@ Function ShowPatchingMenu{
                 break
             }
             2{
-                Get-SolutionUpdate | Where-Object {$_.State -like "Ready*" -or $_.State -like "Additional*"} | FL DisplayName, Description, ResourceId, State, PackageType 
+                Get-SolutionUpdate | Where-Object {$_.State -like "Ready*" -or $_.State -like "Additional*"} | FT DisplayName, Description, ResourceId, State, PackageType -Autosize
                 Pause
                 break
             }
