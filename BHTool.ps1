@@ -128,6 +128,7 @@ Function ShowMenu{
                                 Write-Host "VM found on node: $($node.Name)"
                                 Write-Host "---------------------------------------------"
                             }
+                            break
                         }
                     }
             
