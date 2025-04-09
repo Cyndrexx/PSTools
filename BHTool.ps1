@@ -127,7 +127,7 @@ Function ShowMenu{
                                 Write-Host "---------------------------------------------"
                                 Write-Host "VM found on node: $($node.Name)"
                                 Echo ""
-                                get-vm -name $findvm
+                                get-vm -name $findvm | out-host
                                 Write-Host "---------------------------------------------"
                                 Echo ""
                                 Echo ""
