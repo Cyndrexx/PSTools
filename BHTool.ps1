@@ -133,6 +133,7 @@ Function ShowMenu{
                                 Echo ""
                                 Pause
                                 ShowMenu
+                                break
                             }
                             
                         }
