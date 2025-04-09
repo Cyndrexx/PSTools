@@ -282,6 +282,11 @@ Function ShowPatchingMenu{
                 Pause
                 break
             }
+            2{
+                Get-SolutionUpdate | Where-Object {$_.State -like "Ready*" -or $_.State -like "Additional*"} | FL DisplayName, Description, ResourceId, State, PackageType | Out-Host
+                Pause
+                break
+            }
          
          }
 
