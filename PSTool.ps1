@@ -196,15 +196,10 @@ Function ShowHCIMenu{
                 Write-Host "Grabbing Service Tags..."
                 Echo ""
                 Echo ""
-                Write-Host "Server         Model                     Tag" 
+                Write-Host "Server         Model                     Tag"
                 Write-Host "-----------------------------------------------"
-                foreach($c in $(Get-ClusterNode)) 
-                    { Invoke-Command -ComputerName $c.Name -ScriptBlock 
-                        {Write-Host $env:COMPUTERNAME  " " (Get-WmiObject win32_computersystemproduct).Name "---- "  -NoNewLine 
-                         Write-Host "Service Tag = " -ForegroundColor Yellow -NoNewLine
-                        (Get-WmiObject win32_computersystemproduct).IdentifyingNumber | Out-Host }
-                    } 
-                Echo ""
+                foreach($c in $(Get-ClusterNode)) { Invoke-Command -ComputerName $c.Name -ScriptBlock {Write-Host $env:COMPUTERNAME  " " (Get-WmiObject win32_computersystemproduct).Name "---- "  -NoNewLine; Write-Host "Service Tag = " -ForegroundColor Yellow -NoNewLine;(Get-WmiObject win32_computersystemproduct).IdentifyingNumber }}
+                Echo "" 
                 Echo ""
                 Pause
                 break
