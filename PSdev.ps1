@@ -2,14 +2,7 @@
 
 $text=@"
 $ver
-    ____              __  _      __ 
-   / __ )____ _____  / /_(_)____/ /_
-  / __  / __ `/ __ \/ __/ / ___/ __/
- / /_/ / /_/ / /_/ / /_/ (__  ) /_  
-/_____/\__,_/ .___/\__/_/____/\__/  
-           /_/   
-
-Created by Derek Lawrence  
+    
 "@
 $DateTime=Get-Date -Format yyyyMMdd_HHmmss
 $OSInfo = Get-WmiObject -Class Win32_OperatingSystem
