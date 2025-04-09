@@ -282,7 +282,7 @@ Function ShowPatchingMenu{
                 Write-Host ""
                 Write-Host "The Current Solution Environment Status as follows:"
                 Write-Host ""
-                Get-SolutionUpdateEnvironment | FL CurrentVersion, CurrentSbeVersion, State, HealthState, HealthCheckDate  -Autosize
+                Get-SolutionUpdateEnvironment | FT CurrentVersion, CurrentSbeVersion, State, HealthState, HealthCheckDate -Autosize
                 Pause
                 break
             }
