@@ -30,6 +30,7 @@ Function ShowMenu{
          Write-Host "Press '3' Get Status of Physical Disk"
          Write-Host "Press '4' Get OS Build Information of Nodes"
          Write-Host "Press '5' Get Status of Virtual Disk"
+         Write-Host "Press '6' Find a VM"
          
          
          Write-Host "Press 'H' to Display Help"
@@ -100,18 +101,41 @@ Function ShowMenu{
                 Write-Host "----------------------------------------"
                 Write-Host "Displaying Virtual Disks"
                 Write-Host "----------------------------------------"
+                Get-VirtualDisk | Out-Host
                 Echo""
-                $nodes = Get-ClusterNode | % NodeName
-                Invoke-Command $nodes { $v = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\' -Name CurrentMajorVersionNumber, CurrentMinorVersionNumber, CurrentBuildNumber, UBR; "$(hostname): $($v.CurrentMajorVersionNumber).$($v.CurrentMinorVersionNumber).$($v.CurrentBuildNumber).$($v.UBR)" } | Sort-Object
                 Pause
                 break
              }
-         
-         
-         }
-     }
+             #Find a VM
+             6{
+             Echo ""
+             Echo ""
+             $findvm = Read-Host "Please Provide VM Name"
+             Echo ""
+             $clusters = $clusters = (get-cluster -domain bh.local | where  {($_.name -like "cop-azc*") -or ($_.name -like "NCP-AZC1") -or ($_.name -like "SAP-AZC1")}) 
+                    foreach ($cluster in $clusters) {
+                        Write-Host "Checking Cluster: $($cluster.Name)"
+                        $nodes = Get-ClusterNode -Cluster $cluster.Name
+                        foreach ($node in $nodes) {
+                            Write-Host "  Checking Node: $($node.Name)"
+                            #Get VMs on the node
+                            $vms = Get-VM -ComputerName $node.Name
+                            if($vms -contains $findvm){
+                                Write-Host "Found VM in $node"
+                                pause
+                                break
+                            }
+                        }
+                    }
+            
+                }
+            }
+        }
     while ($selection -ne "q")
+    
+    
     }
+    
     
     
 
