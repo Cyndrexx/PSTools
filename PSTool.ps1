@@ -28,7 +28,7 @@ Function ShowMenu{
          Write-Host "Press '3' Get Disk Usage"
          Write-Host "Press '4' Get List of Installed Drivers"
          Write-Host "Press '5' Get List of Virtual Disks"
-         #Write-Host "Press 'p' For Patching Menu"
+         Write-Host "Press '6' to Run DISM Check"
 
          #Write-Host "Press '4' Get OS Build Information of Nodes"
          #Write-Host "Press '5' Get Status of Virtual Disk"
@@ -36,7 +36,8 @@ Function ShowMenu{
          
 
          
-         
+         Write-Host ""
+         Write-Host ""
          Write-Host "Press 'H' to Display Help"
          Write-Host "Press 'Q' to Quit"
          Write-Host ""
@@ -137,36 +138,14 @@ Function ShowMenu{
              6{
              Echo ""
              Echo ""
-             $findvm = Read-Host "Please Provide VM Name"
+             Write-Host " DISM check requires an elevated cmd window."
+             Write-Host " Ensure that you run as Administrator" 
              Echo ""
-             $clusters = $clusters = (get-cluster -domain bh.local | where  {($_.name -like "cop-azc*") -or ($_.name -like "NCP-AZC1") -or ($_.name -like "SAP-AZC1")}) 
-                    foreach ($cluster in $clusters) {
-                        Write-Host "Checking Cluster: $($cluster.Name)"
-                        $nodes = Get-ClusterNode -Cluster $cluster.Name
-                        foreach ($node in $nodes) {
-                            Write-Host "  Checking Node: $($node.Name)"
-                            #Get VMs on the node
-                            $vms = Get-VM -ComputerName $node.Name
-                            if($vms -match $findvm){
-                                Echo ""
-                                Echo ""
-                                Write-Host "VM HAS BEEN FOUND"
-                                Write-Host "---------------------------------------------"
-                                Write-Host "VM found on node: $($node.Name)"
-                                Echo ""
-                                get-vm -name $findvm | out-host
-                                Write-Host "---------------------------------------------"
-                                Echo ""
-                                Echo ""
-                                Pause
-                                ShowMenu
-                                break 2
-                            }
-                            
-                        }
-                    }
+             dism.exe /online /Cleanup-Image /StartComponentCleanup
+             Pause
+             break
             
-                }
+              }
                 
             }#End of Switch
         }#End of "DO"
@@ -191,6 +170,7 @@ Function ShowHCIMenu{
          Write-Host "Press '2' Get-StorageJob"
          Write-Host "Press '3' Get Status of Physical Disk"
          Write-Host "Press '4' Get OS Build Information of Nodes"
+         Write-Host "Press '5' To Locate a VM on the Clusters"
          Write-Host "Press 'E' To Return to Main menu"
          $HCIselection = Read-Host "Please make a selection"
       
@@ -253,6 +233,42 @@ Function ShowHCIMenu{
                 Pause
                 break
              }
+             5{
+             Echo ""
+             Echo ""
+             $findvm = Read-Host "Please Provide VM Name"
+             Echo ""
+             $clusters = $clusters = (get-cluster -domain bh.local | where  {($_.name -like "cop-azc*") -or ($_.name -like "NCP-AZC1") -or ($_.name -like "SAP-AZC1")}) 
+                    foreach ($cluster in $clusters) {
+                        Write-Host "Checking Cluster: $($cluster.Name)"
+                        $nodes = Get-ClusterNode -Cluster $cluster.Name
+                        foreach ($node in $nodes) {
+                            Write-Host "  Checking Node: $($node.Name)"
+                            #Get VMs on the node
+                            $vms = Get-VM -ComputerName $node.Name
+                            if($vms -match $findvm){
+                                Echo ""
+                                Echo ""
+                                Write-Host "VM HAS BEEN FOUND"
+                                Write-Host "---------------------------------------------"
+                                Write-Host "VM found on node: $($node.Name)"
+                                Echo ""
+                                get-vm -name $findvm | out-host
+                                Write-Host "---------------------------------------------"
+                                Echo ""
+                                Echo ""
+                                Pause
+                                ShowMenu
+                                break 2
+                            }
+                            
+                        }
+                    }
+            
+                }
+
+
+
         e{
             Write-Host ""
             Write-Host "Returning to Main Menu...."
