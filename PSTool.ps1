@@ -27,6 +27,7 @@ Function ShowMenu{
          Write-Host "Press '2' Get Status of Physical Disk"
          Write-Host "Press '3' Get Disk Usage"
          Write-Host "Press '4' Get List of Installed Drivers"
+         Write-Host "Press '5' Get List of Virtual Disks"
          #Write-Host "Press 'p' For Patching Menu"
 
          #Write-Host "Press '4' Get OS Build Information of Nodes"
