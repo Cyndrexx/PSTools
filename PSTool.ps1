@@ -26,6 +26,7 @@ Function ShowMenu{
          #Write-Host "Press '2' Get Status of StorageJob"
          Write-Host "Press '2' Get Status of Physical Disk"
          Write-Host "Press '3' Get Disk Usage"
+         Write-Host "Press '4' Get List of Installed Drivers"
          #Write-Host "Press 'p' For Patching Menu"
 
          #Write-Host "Press '4' Get OS Build Information of Nodes"
@@ -109,9 +110,16 @@ Function ShowMenu{
                      Pause
                      ShowMenu
              }#End of 3
-
-             #Display OS Build of each Node
              
+             #List currently installed drivers
+             4{
+                GWmi Win32_PnPSignedDriver|?{$_.DeviceName -match "HBA"-or($_.DeviceName -match "Marvell")-or(($_.DeviceName -match "Chipset")-and($_.DeviceName -match "Controller"))-or ($_.DeviceName -match "Ethernet")-or ($_.DeviceName -match "FastLinQ")-or ($_.DeviceName -match "QLogic")-or ($_.DeviceName -match "giga")-or ($_.DeviceName -match "PERC")-or ($_.DeviceName -match "Mell")-or ($_.DeviceName -match "NVIDIA")-or ($_.DeviceName -match "E810")-or ($_.DeviceName -match "SMBus")} | select PSComputerName, DeviceName, DriverVersion, Manufacturer,infname | Sort DeviceName | FT -AutoSize
+                Pause
+                break
+             }#End of 4
+
+             
+             #Display OS Build of each Node
              5{
                 Echo ""
                 Echo ""
@@ -186,7 +194,11 @@ Function ShowHCIMenu{
          $HCIselection = Read-Host "Please make a selection"
       
     
-    
+ #     _   _  ____ ___   __  __                  
+ #| | | |/ ___|_ _| |  \/  | ___ _ __  _   _ 
+ #| |_| | |    | |  | |\/| |/ _ \ '_ \| | | |
+ #|  _  | |___ | |  | |  | |  __/ | | | |_| |
+ #|_| |_|\____|___| |_|  |_|\___|_| |_|\__,_|
 
     switch($HCISelection){
              
@@ -257,8 +269,16 @@ Function ShowHCIMenu{
 }
 
 
+#  ____       _       _       __  __                  
+# |  _ \ __ _| |_ ___| |__   |  \/  | ___ _ __  _   _ 
+# | |_) / _` | __/ __| '_ \  | |\/| |/ _ \ '_ \| | | |
+# |  __/ (_| | || (__| | | | | |  | |  __/ | | | |_| |
+# |_|   \__,_|\__\___|_| |_| |_|  |_|\___|_| |_|\__,_|
+
 Function ShowPatchingMenu{
+        $sol=""
         do{
+        
         $PatchSelection=""
          Clear-Host
          Write-Host $text
@@ -266,6 +286,10 @@ Function ShowPatchingMenu{
          #Write-Host "Please make a selection of what you would like to do"
          Write-Host ""
          Write-Host "==================== Please make a selection ====================="
+         Write-Host ""
+         Write-Host "--------------------------------------------------------"
+         Write-Host "Current Selected ResourceID = " $sol
+         Write-Host "--------------------------------------------------------"
          Write-Host ""
          Write-Host "Press '1' Get Solution Environment"
          Write-Host "Press '2' Get Available Update Information"
@@ -276,12 +300,13 @@ Function ShowPatchingMenu{
          switch($PatchSelection){
             1{
                 Write-Host ""
-                Write-Host "The Current Solution Environment Status as follows:"
+                Write-Host "The Current Solution Environment:"
                 Write-Host ""
                 Get-SolutionUpdateEnvironment | FT CurrentVersion, CurrentSbeVersion, State, HealthState, HealthCheckDate -Autosize
                 Pause
                 break
-            }
+            }#End of 1
+
             2{
                 Write-Host ""
                 Write-Host "Below are the following Available Updates.  Solutions generally go before any SBE update"
@@ -290,7 +315,8 @@ Function ShowPatchingMenu{
                 Echo ""
                 Pause
                 break
-            }
+            }#End of 2
+
             3{
                 Write-Host ""
                 $sol = Read-Host "Which Solution ID"
